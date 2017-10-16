@@ -17,7 +17,8 @@ http://www.ogre3d.org/wiki/
 
 #ifndef __TutorialApplication_h_
 #define __TutorialApplication_h_
-
+#include<Terrain\OgreTerrain.h>
+#include<Terrain\OgreTerrainGroup.h>
 #include "BaseApplication.h"
 
 //---------------------------------------------------------------------------
@@ -32,8 +33,24 @@ public:
 
 protected:
 	virtual void createScene(void);
-	virtual void createCamera(void);
-    virtual void createViewports(void);
+//	virtual void createCamera(void);
+  //  virtual void createViewports(void);
+	virtual void createFrameListener();
+	virtual void destroyScene();
+	virtual bool frameRenderingQueued(const FrameEvent& fe);
+
+private:
+	void defineTerrain(long x, long y);
+	void initBlendMaps(Terrain* terrain);
+	void configureTerrainDefaults(Light* light);
+
+	bool mTerrainsImported;
+	Ogre::TerrainGroup* mTerrainGroup;
+	Ogre::TerrainGlobalOptions* mTerrainGlobals;
+	OgreBites::Label* mInfoLabel;
+	std::vector<Entity*> entities;
+	std::vector<SceneNode*> nodes;
+	int numberOfNodes;
 };
 
 //---------------------------------------------------------------------------
