@@ -25,14 +25,40 @@ TutorialApplication::TutorialApplication(void)
 TutorialApplication::~TutorialApplication(void)
 {
 }
+void TutorialApplication::createCamera()
+{
+	mCamera = mSceneMgr->createCamera("PlayerCam");
+	mCamera->setPosition(Ogre::Vector3(150, 700, 900));
+	//mCamera->setPosition(Ogre::Vector3(150, 10, 900));
+	mCamera->lookAt(Ogre::Vector3(150, 0, 0));
+	mCamera->setNearClipDistance(5);
+	mCameraMan = new OgreBites::SdkCameraMan(mCamera);
 
+}
+
+void TutorialApplication::createViewports()
+{
+	Viewport* vp = mWindow->addViewport(mCamera);
+	vp->setBackgroundColour(Ogre::ColourValue(0, 0, 0));
+	mCamera->setAspectRatio(
+		Ogre::Real(vp->getActualWidth()) /
+		Ogre::Real(vp->getActualHeight()));
+
+}
 //---------------------------------------------------------------------------
 void TutorialApplication::createScene(void)
 {
 	// Create your scene here :)
-	mCamera->setPosition(Ogre::Vector3(150, 700, 900));
-	mCamera->lookAt(Ogre::Vector3(150, 0, 0));
-	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
+	
+	//Lights
+	mSceneMgr->setAmbientLight(Ogre::ColourValue(.8, .8, .8));
+	mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+
+	/*Ogre::Light* light = mSceneMgr->createLight("MainLight");
+	light->setPosition(20, 80, 50);*/
+	
+	
+
 	
 	//Ogre::Entity* ogreEntity1 = new Entity[5];
 	std::vector<Entity*> entities;
@@ -48,43 +74,33 @@ void TutorialApplication::createScene(void)
 		nodes[i]->attachObject(entities[i]);
 		//ogreNode->attachObject(ogreEntity);
 		nodes[i]->scale(.1, .1, .1);
+		
 		if (i % 10 == 0) {
 			y = y + 30;
 		}
-		nodes[i]->setPosition(30+((i%10) * 30), 0, y);
+		nodes[i]->setPosition(30+((i%10) * 30), 10, y);
 	}
-	Ogre::Light* light = mSceneMgr->createLight("MainLight");
-	light->setPosition(20, 80, 50);
+	
 	
 	Plane plane(Ogre::Vector3::UNIT_Y, 0);
-	Plane plane2(Vector3::UNIT_X, 0);
+
 	MeshManager::getSingleton().createPlane(
 		"ground",
 		Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
 		plane,
-		500, 1000, 20, 20,
+		1500, 1500, 20, 20,
 		true,
 		1, 5, 5,
 		Ogre::Vector3::UNIT_Z);
 
-	MeshManager::getSingleton().createPlane(
-		"wall",
-		Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-		plane2,
-		500, 1000, 20, 20,
-		true,
-		1, 5, 5,
-		Ogre::Vector3::UNIT_Z);
+	
 
 	Entity* groundEntity = mSceneMgr->createEntity("ground");
 	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(groundEntity);
 	groundEntity->setCastShadows(false);
 	groundEntity->setMaterialName("Examples/Rockwall");
 
-	Entity* groundEntity1 = mSceneMgr->createEntity("wall");
-	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(groundEntity1);
-	groundEntity1->setCastShadows(false);
-	groundEntity1->setMaterialName("Examples/Rockwall");
+	
 
 }
 //---------------------------------------------------------------------------
