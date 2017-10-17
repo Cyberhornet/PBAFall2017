@@ -43,7 +43,7 @@ private:
 	void defineTerrain(long x, long y);
 	void initBlendMaps(Terrain* terrain);
 	void configureTerrainDefaults(Light* light);
-
+	void TutorialApplication::getMinimumPoint(int&minX, int&minY, int&minZ, int delta,int pDelta, Vector3 pos);
 	bool mTerrainsImported;
 	Ogre::TerrainGroup* mTerrainGroup;
 	Ogre::TerrainGlobalOptions* mTerrainGlobals;

@@ -23,7 +23,7 @@ TutorialApplication::TutorialApplication(void)
 mTerrainGlobals(0),
 mInfoLabel(0)
 {
-	numberOfNodes = 100;
+	numberOfNodes = 200;
 }
 //---------------------------------------------------------------------------
 TutorialApplication::~TutorialApplication(void)
@@ -36,19 +36,119 @@ void TutorialApplication::destroyScene()
 	OGRE_DELETE mTerrainGlobals;
 }
 
+void TutorialApplication::getMinimumPoint(int&minX,int&minY,int&minZ,int delta,int pDelta,Vector3 pos)
+{
+	int minT;
+	minY = mTerrainGroup->getHeightAtWorldPosition(pos.x, pos.y, pos.z + delta, 0);
+	minX = pos.x;
+	minZ = pos.z + pDelta;
+
+	minT = mTerrainGroup->getHeightAtWorldPosition(pos.x + delta, pos.y, pos.z + delta, 0);
+	if (minT< minY)
+	{
+		minX = pos.x + pDelta;
+		minZ = pos.z + pDelta;
+
+		minY = minT;
+	}
+	else {
+
+		minT = mTerrainGroup->getHeightAtWorldPosition(pos.x + delta, pos.y, pos.z, 0);
+		if (minT< minY)
+		{
+			minX = pos.x + pDelta;
+			minZ = pos.z;
+
+			minY = minT;
+		}
+		else {
+			minT = mTerrainGroup->getHeightAtWorldPosition(pos.x + delta, pos.y, pos.z - delta, 0);
+			if (minT< minY)
+			{
+				minX = pos.x + pDelta;
+				minZ = pos.z - pDelta;
+
+				minY = minT;
+			}
+			else {
+				minT = mTerrainGroup->getHeightAtWorldPosition(pos.x, pos.y, pos.z - delta, 0);
+				if (minT< minY)
+				{
+					minX = pos.x;
+					minZ = pos.z - pDelta;
+
+					minY = minT;
+				}
+				else {
+					minT = mTerrainGroup->getHeightAtWorldPosition(pos.x, pos.y, pos.z - delta, 0);
+					if (minT< minY)
+					{
+						minX = pos.x;
+						minZ = pos.z - pDelta;
+
+						minY = minT;
+					}
+					else {
+						minT = mTerrainGroup->getHeightAtWorldPosition(pos.x - delta, pos.y, pos.z - delta, 0);
+						if (minT< minY)
+						{
+							minX = pos.x - pDelta;
+							minZ = pos.z - pDelta;
+
+							minY = minT;
+						}
+						else {
+							minT = mTerrainGroup->getHeightAtWorldPosition(pos.x - delta, pos.y, pos.z, 0);
+							if (minT< minY)
+							{
+								minX = pos.x - pDelta;
+								minZ = pos.z;
+
+								minY = minT;
+							}
+							else {
+
+								minT = mTerrainGroup->getHeightAtWorldPosition(pos.x - delta, pos.y, pos.z + delta, 0);
+								if (minT< minY)
+								{
+									minX = pos.x - pDelta;
+									minZ = pos.z + pDelta;
+
+									minY = minT;
+								}
+
+							}
+
+						}
+					}
+				}
+			}
+		}
+	}
+}
 bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& fe)
 {
 	bool ret = BaseApplication::frameRenderingQueued(fe);
+	
+	int minX = 0; int minY = 0; int minZ = 0; int minT = 0; int delta = 5; int pDelta = 2;
 
 	for (int i = 0; i < numberOfNodes;i++)
 	{
       
 		Vector3 pos= nodes[i]->getPosition();
-		pos.x = pos.x - (rand() % 4);
-		pos.y = pos.y - (rand() % 4);
-		pos.z = pos.z - (rand() % 4);
-		nodes[i]->setPosition(pos);
-		//nodes[i]->translate()
+		
+		
+		getMinimumPoint(minX, minY, minZ, delta,pDelta, pos);
+		minY=mTerrainGroup->getHeightAtWorldPosition(minX, pos.y,minZ, 0);
+		if (minY < pos.y) {
+			nodes[i]->setPosition(minX, 10 + minY, minZ);
+		}
+		else {
+			nodes[i]->setPosition(pos.x, 10 + pos.y, pos.z);
+		}
+		
+		
+		
 	}
 
 
@@ -222,7 +322,7 @@ void TutorialApplication::createScene(void)
 	/////Camera
 
 	mCamera->setPosition(Ogre::Vector3(1283,700, 1916));
-	mCamera->lookAt(Ogre::Vector3(1263, 550, 1160));
+	mCamera->lookAt(Ogre::Vector3(1063, 550, 1160));
 	mCamera->setNearClipDistance(0.1);
 
 	bool infiniteClip =
@@ -265,11 +365,12 @@ void TutorialApplication::createScene(void)
 		nodes[i]->attachObject(entities[i]);
 
 		nodes[i]->scale(.1, .1, .1);
+		//nodes[i]->showBoundingBox(true);
 		
 		if (i % 10 == 0) {
-			y = y + 30;
+			y = y + 10;
 		}
-		nodes[i]->setPosition(30+((i%10) * 30), 700, y);
+		nodes[i]->setPosition(10+((i%10) * 30), 700, y);
 	}
 	
 
